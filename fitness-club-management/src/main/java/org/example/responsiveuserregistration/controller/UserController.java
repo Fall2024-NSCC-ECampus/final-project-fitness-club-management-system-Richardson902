@@ -23,8 +23,6 @@ import java.util.Set;
 @Controller
 public class UserController {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-
     @Autowired
     private UserService userService;
 
@@ -107,41 +105,24 @@ public class UserController {
 
     @PostMapping("/users/{userId}/updateRole")
     public String updateUserRole(@PathVariable Long userId, @RequestParam(value = "trainerRole", required = false) String trainerRole, Model model) {
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            Set<String> roles = user.getRoles();
-            if (trainerRole != null) {
-                roles.add("TRAINER");
-            } else {
-                roles.remove("TRAINER");
-            }
-            user.setRoles(roles);
-            userRepository.save(user);
-            model.addAttribute("user", user);
+        try {
+            userService.updateUserRole(userId, trainerRole);
             model.addAttribute("successMessage", "Role updated successfully");
-        } else {
-            model.addAttribute("errorMessage", "User not found");
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
         }
-        return "userdetails";
+        return "redirect:/users/" + userId;
     }
 
     @PostMapping("/users/{userId}/delete")
     public String deleteUser(@PathVariable Long userId, @AuthenticationPrincipal UserDetails currentUser, Model model) {
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            if (user.getUsername().equals(currentUser.getUsername())) {
-                model.addAttribute("errorMessage", "You cannot delete yourself");
-                return "userdetails";
-            } else {
-                userRepository.delete(user);
-                model.addAttribute("successMessage", "User deleted successfully");
-            }
-        } else {
-            model.addAttribute("errorMessage", "User not found");
+        try {
+            userService.deleteUser(userId, currentUser.getUsername());
+            return "redirect:/users";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "redirect:/users";
         }
-        return "redirect:/users";
     }
 
 

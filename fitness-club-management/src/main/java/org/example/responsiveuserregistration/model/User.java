@@ -41,4 +41,6 @@ public class User {
     @CollectionTable(name = "roles", joinColumns = @JoinColumn(name = "userId"))
     @Column(name = "role")
     private Set<String> roles;
+
+    //Add contraints to roles
 }

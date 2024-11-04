@@ -12,7 +12,7 @@
         <p>Email: <span th:text="${user.email}"></span></p>
         <p>Roles: <span th:text="${user.roles}"></span></p>
 
-        <form th:action="@{/users/{userId}/updateRole(userId=${userId})}" method="post">
+        <form th:action="@{/users/{userId}/updateRole(userId=${user.userId})}" method="post">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="trainerRole" name="trainerRole" th:checked="${user.roles.contains('TRAINER')}">
                 <label class="form-check-label" for="trainerRole">Trainer</label>
