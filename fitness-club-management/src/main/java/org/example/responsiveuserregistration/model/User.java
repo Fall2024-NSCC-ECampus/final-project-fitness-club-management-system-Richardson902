@@ -42,5 +42,16 @@ public class User {
     @Column(name = "role")
     private Set<String> roles;
 
+    @OneToMany(mappedBy = "user")
+    private Set<Attendance> attendances;
+
+    public User(Long userId, String username, String email, String password, Set<String> roles) {
+        this.userId = userId;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.roles = roles;
+    }
+
     //Add contraints to roles
 }

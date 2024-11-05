@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -51,6 +52,14 @@ public class UserService implements UserDetailsService {
         }
     }
 
+    public List<User> getUsersByRole(String role) {
+        return userRepository.findByRolesContaining(role);
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
     public void registerUser(String username, String email, String password){
 
         // Trim it to avoid nonsense
@@ -74,7 +83,7 @@ public class UserService implements UserDetailsService {
         String adminEmail = "admin@admin.com";
         String adminPassword = "admin123"; // Great password, very secure
 
-        Optional<User> adminUser = userRepository.findByRolesContaining("ADMIN"); // DOES AN ADMIN EXIST?????
+        List<User> adminUser = userRepository.findByRolesContaining("ADMIN"); // DOES AN ADMIN EXIST?????
         if (adminUser.isEmpty()) {
             String hashedPassword = passwordEncoder.encode(adminPassword);
             User admin = new User(null, adminUsername, adminEmail, hashedPassword, Set.of("ADMIN", "USER")); // Create new user, add big bad admin status
