@@ -15,7 +15,7 @@
             <th>Start Time</th>
             <th>End Time</th>
             <th>Trainer</th>
-            <th>Users</th>
+            <th>Participants</th>
         </tr>
         </thead>
         <tbody>
@@ -26,7 +26,7 @@
             <td th:text="${schedule.trainerId}"></td>
             <td>
                 <ul>
-                    <li th:each="attendance : ${schedule.attendances}" th:text="${attendance.user.username}"></li>
+                    <li th:each="participant : ${schedule.participants}" th:text="${participant.username}"></li>
                 </ul>
             </td>
         </tr>

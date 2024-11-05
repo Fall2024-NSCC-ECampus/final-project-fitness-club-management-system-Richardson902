@@ -42,6 +42,20 @@ public class ScheduleController {
     @GetMapping("/schedule/view")
     public String viewSchedule(Model model) {
         List<Schedule> schedules = scheduleService.getAllSchedules();
+
+        for (Schedule schedule : schedules) {
+            logger.info("Schedule ID: {}", schedule.getScheduleId());
+
+            if (schedule.getParticipants().isEmpty()) {
+                logger.info("No participants in this schedule");
+            } else {
+
+                for (User participant : schedule.getParticipants()) {
+                    logger.info("Participant ID: {}, Username: {}", participant.getUserId(), participant.getUsername());
+                }
+            }
+
+        }
         model.addAttribute("schedules", schedules);
         return "viewschedule";
     }

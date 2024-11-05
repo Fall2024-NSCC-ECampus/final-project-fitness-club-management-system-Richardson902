@@ -32,6 +32,6 @@ public class Schedule {
     @Column(name = "trainer_id", nullable = false)
     private Long trainerId;
 
-    @OneToMany(mappedBy = "schedule", fetch = FetchType.EAGER) // fix for lazy loading issue
-    private Set<Attendance> attendances;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<User> participants;
 }
