@@ -22,8 +22,6 @@ import org.slf4j.LoggerFactory;
 @Controller
 public class ScheduleController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ScheduleController.class);
-
     @Autowired
     private ScheduleService scheduleService;
 
@@ -42,20 +40,6 @@ public class ScheduleController {
     @GetMapping("/schedule/view")
     public String viewSchedule(Model model) {
         List<Schedule> schedules = scheduleService.getAllSchedules();
-
-        for (Schedule schedule : schedules) {
-            logger.info("Schedule ID: {}", schedule.getScheduleId());
-
-            if (schedule.getParticipants().isEmpty()) {
-                logger.info("No participants in this schedule");
-            } else {
-
-                for (User participant : schedule.getParticipants()) {
-                    logger.info("Participant ID: {}, Username: {}", participant.getUserId(), participant.getUsername());
-                }
-            }
-
-        }
         model.addAttribute("schedules", schedules);
         return "viewschedule";
     }
@@ -66,8 +50,6 @@ public class ScheduleController {
                                   @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
                                   @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime startTime,
                                   @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime endTime) {
-        logger.info("Received request to schedule session with trainerId: {}, userIds: {}, date: {}, startTime: {}, endTime: {}",
-                trainerId, userIds, date, startTime, endTime);
         scheduleService.scheduleSession(trainerId, userIds, date, startTime, endTime);
         return "redirect:/schedule/edit";
     }

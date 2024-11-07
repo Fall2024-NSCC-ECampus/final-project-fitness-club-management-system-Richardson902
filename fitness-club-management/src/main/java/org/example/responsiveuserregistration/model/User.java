@@ -6,8 +6,10 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -15,6 +17,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(exclude = "schedules")
 public class User {
 
     @Id
@@ -43,7 +46,7 @@ public class User {
     private Set<String> roles;
 
     @ManyToMany(mappedBy = "participants")
-    private Set<Schedule> schedules;
+    private Set<Schedule> schedules = new HashSet<>();
 
     public <E> User(Object o, String username, String email, String hashedPassword, Set<E> user) {
     }
