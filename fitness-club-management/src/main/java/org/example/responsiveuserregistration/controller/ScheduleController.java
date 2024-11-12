@@ -6,18 +6,15 @@ import org.example.responsiveuserregistration.service.ScheduleService;
 import org.example.responsiveuserregistration.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Date;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Controller
 public class ScheduleController {
@@ -34,23 +31,71 @@ public class ScheduleController {
         List<User> users = userService.getAllUsers();
         model.addAttribute("trainers", trainers);
         model.addAttribute("users", users);
-        return "schedule";
+        return "newsession";
     }
 
     @GetMapping("/schedule/view")
-    public String viewSchedule(Model model) {
-        List<Schedule> schedules = scheduleService.getAllSchedules();
+    public String viewSchedule(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        User user = userService.getUserByUsername(userDetails.getUsername());
+        List<Schedule> schedules = scheduleService.getSchedulesForUser(user);
         model.addAttribute("schedules", schedules);
         return "viewschedule";
     }
 
+    @GetMapping("/schedule/edit/{scheduleId}/times")
+    public String showEditTimePage(@PathVariable Long scheduleId, Model model) {
+        Schedule schedule = scheduleService.findById(scheduleId);
+        model.addAttribute("schedule", schedule);
+        return "editsessiontimes";
+    }
+
+    @GetMapping("/schedule/edit/{scheduleId}/participants")
+    public String showEditParticipantsPage(@PathVariable Long scheduleId, Model model) {
+        List<User> users = userService.getAllUsers();
+        Schedule schedule = scheduleService.findById(scheduleId);
+        model.addAttribute("users", users);
+        model.addAttribute("schedule", schedule);
+        return "editsessionparticipants";
+    }
+
+    @GetMapping("/schedule/edit/{scheduleId}/trainer")
+    public String showEditTrainerPage(@PathVariable Long scheduleId, Model model) {
+        List<User> trainers = userService.getUsersByRole("TRAINER");
+        Schedule schedule = scheduleService.findById(scheduleId);
+        model.addAttribute("trainers", trainers);
+        model.addAttribute("schedule", schedule);
+        return "editsessiontrainer";
+    }
+
     @PostMapping("/schedule")
-    public String scheduleSession(@RequestParam Long trainerId,
-                                  @RequestParam List<Long> userIds,
-                                  @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
-                                  @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime startTime,
-                                  @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime endTime) {
+    public String scheduleSession(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                                  @RequestParam("trainerId") Long trainerId,
+                                  @RequestParam("userIds") List<Long> userIds,
+                                  @RequestParam("startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
+                                  @RequestParam("endTime")@DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
         scheduleService.scheduleSession(trainerId, userIds, date, startTime, endTime);
         return "redirect:/schedule/edit";
+    }
+
+    @PostMapping("/schedule/edit/{scheduleId}/time")
+    public String updateClassTime(@PathVariable("scheduleId") Long scheduleId,
+                                  @RequestParam("startTime") LocalTime startTime,
+                                  @RequestParam("endTime") LocalTime endTime) {
+        scheduleService.updateClassTime(scheduleId, startTime, endTime);
+        return "redirect:/schedule/view";
+    }
+
+    @PostMapping("/schedule/edit/{scheduleId}/trainer")
+    public String updateClassTrainer(@PathVariable("scheduleId") Long scheduleId,
+                                     @RequestParam("trainerId") Long trainerId) {
+        scheduleService.updateClassTrainer(scheduleId, trainerId);
+        return "redirect:/schedule/view";
+    }
+
+    @PostMapping("/schedule/edit/{scheduleId}/participants")
+    public String updateScheduleParticipants(@PathVariable("scheduleId") Long scheduleId,
+                                            @RequestParam("userIds") List<Long> userIds) {
+        scheduleService.updateScheduleParticipants(scheduleId, userIds);
+        return "redirect:/schedule/view";
     }
 }

@@ -48,7 +48,12 @@ public class User {
     @ManyToMany(mappedBy = "participants")
     private Set<Schedule> schedules = new HashSet<>();
 
-    public <E> User(Object o, String username, String email, String hashedPassword, Set<E> user) {
+    // because no ID, we can't use annotations for all args constructor
+    public User(String username, String email, String hashedPassword, Set<String> roles) {
+        this.username = username;
+        this.email = email;
+        this.password = hashedPassword;
+        this.roles = roles;
     }
 
 

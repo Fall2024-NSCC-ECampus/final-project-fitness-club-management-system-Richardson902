@@ -34,7 +34,7 @@ public class UserService implements UserDetailsService {
     }
 
     // We love getting rid of redundancy
-    private User getUserByUsername(String username) {
+    public User getUserByUsername(String username) {
         Optional<User> userOptional= userRepository.findByUsername(username);
         if (userOptional.isPresent()) {
             return userOptional.get();
@@ -73,7 +73,7 @@ public class UserService implements UserDetailsService {
         String hashedPassword = passwordEncoder.encode(password); // Hash that s*** NO PLAINTEXT PASSWORDS IN HERE
         logger.info("Hashed password: {}", hashedPassword);
 
-        User user = new User(null, username, email, hashedPassword, Set.of("USER")); // Create new user and set default role
+        User user = new User(username, email, hashedPassword, Set.of("USER")); // Create new user and set default role
         userRepository.save(user);
     }
 
@@ -86,7 +86,7 @@ public class UserService implements UserDetailsService {
         List<User> adminUser = userRepository.findByRolesContaining("ADMIN"); // DOES AN ADMIN EXIST?????
         if (adminUser.isEmpty()) {
             String hashedPassword = passwordEncoder.encode(adminPassword);
-            User admin = new User(null, adminUsername, adminEmail, hashedPassword, Set.of("ADMIN", "USER")); // Create new user, add big bad admin status
+            User admin = new User(adminUsername, adminEmail, hashedPassword, Set.of("Admin", "User")); // Create new user, add big bad admin status
             userRepository.save(admin);
             logger.info("Admin user created");
         } else {
