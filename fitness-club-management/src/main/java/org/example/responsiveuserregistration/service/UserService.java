@@ -60,23 +60,6 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    public void registerUser(String username, String email, String password){
-
-        // Trim it to avoid nonsense
-        username = username.trim().toLowerCase();
-        email = email.trim().toLowerCase();
-
-        if (userRepository.existsByUsernameOrEmail(username, email)) {
-            throw new IllegalArgumentException("User already exists");
-        }
-
-        String hashedPassword = passwordEncoder.encode(password); // Hash that s*** NO PLAINTEXT PASSWORDS IN HERE
-        logger.info("Hashed password: {}", hashedPassword);
-
-        User user = new User(username, email, hashedPassword, Set.of("USER")); // Create new user and set default role
-        userRepository.save(user);
-    }
-
     // Create a default admin user if one does not exist - called at startup
     private void createDefaultAdmin() {
         String adminUsername = "admin";
@@ -92,15 +75,6 @@ public class UserService implements UserDetailsService {
         } else {
             logger.info("Admin user already exists");
         }
-    }
-
-    // Update password for a user, admin123 is not a very secure password lol
-    public void updatePassword(String username, String newPassword) {
-        User user = getUserByUsername(username);
-        String hashedPassword = passwordEncoder.encode(newPassword);
-        user.setPassword(hashedPassword); // sets new password to new hashed password. SECURITY MOMENT
-        userRepository.save(user);
-        logger.info("Password updated for user: {}", username);
     }
 
     public void updateUserRole(Long userId, String trainerRole) {

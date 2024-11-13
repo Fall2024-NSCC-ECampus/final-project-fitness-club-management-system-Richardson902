@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -38,4 +38,14 @@ public class Schedule {
     @ManyToMany(fetch = FetchType.LAZY)
     private Set<User> participants;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    private Set<User> absentUsers = new HashSet<>();
+
+
+    public Schedule(Long trainerId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+        this.trainerId = trainerId;
+        this.date = date;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
 }

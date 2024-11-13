@@ -19,6 +19,7 @@
             <th>End Time</th>
             <th>Trainer</th>
             <th>Participants</th>
+            <th sec:authorize="hasRole('ADMIN')">Absent</th>
         </tr>
         </thead>
         <tbody>
@@ -32,10 +33,14 @@
                     <li th:each="participant : ${schedule.participants}" th:text="${participant.username}"></li>
                 </ul>
             </td>
+            <td sec:authorize="hasRole('ADMIN')">
+                <ul>
+                    <li th:each="participant : ${schedule.absentUsers}" th:text="${participant.username}"></li>
             <td sec:authorize="hasRole('ROLE_ADMIN')">
                 <a th:href="@{/schedule/edit/{scheduleId}/times(scheduleId=${schedule.scheduleId})}" class="btn btn-primary">Edit Times</a>
                 <a th:href="@{/schedule/edit/{scheduleId}/trainer(scheduleId=${schedule.scheduleId})}" class="btn btn-primary">Edit Trainer</a>
                 <a th:href="@{/schedule/edit/{scheduleId}/participants(scheduleId=${schedule.scheduleId})}" class="btn btn-primary">Edit Participants</a>
+                <a th:href="@{/schedule/mark-attendance/{scheduleId}(scheduleId=${schedule.scheduleId})}" class="btn btn-primary">Mark Attendance</a>
             </td>
         </tr>
         </tbody>

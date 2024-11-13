@@ -1,7 +1,9 @@
 package org.example.responsiveuserregistration.controller;
 
+import jakarta.validation.Valid;
 import org.example.responsiveuserregistration.model.Schedule;
 import org.example.responsiveuserregistration.model.User;
+import org.example.responsiveuserregistration.payload.*;
 import org.example.responsiveuserregistration.service.ScheduleService;
 import org.example.responsiveuserregistration.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -67,6 +70,13 @@ public class ScheduleController {
         return "editsessiontrainer";
     }
 
+    @GetMapping("/schedule/mark-attendance/{scheduleId}")
+    public String showMarkAttendancePage(@PathVariable Long scheduleId, Model model) {
+        Schedule schedule = scheduleService.findById(scheduleId);
+        model.addAttribute("schedule", schedule);
+        return "editattendance";
+    }
+
     @PostMapping("/schedule")
     public String scheduleSession(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
                                   @RequestParam("trainerId") Long trainerId,
@@ -78,24 +88,29 @@ public class ScheduleController {
     }
 
     @PostMapping("/schedule/edit/{scheduleId}/time")
-    public String updateClassTime(@PathVariable("scheduleId") Long scheduleId,
-                                  @RequestParam("startTime") LocalTime startTime,
-                                  @RequestParam("endTime") LocalTime endTime) {
-        scheduleService.updateClassTime(scheduleId, startTime, endTime);
+    public String updateClassTime(@PathVariable("scheduleId") Long scheduleId, @Valid @ModelAttribute("request") TimeRequest request, BindingResult result) {
+        if (result.hasErrors()) {
+            return "editsessiontimes";
+        }
+        scheduleService.updateClassTime(scheduleId, request.getStartTime(), request.getEndTime());
         return "redirect:/schedule/view";
     }
 
     @PostMapping("/schedule/edit/{scheduleId}/trainer")
-    public String updateClassTrainer(@PathVariable("scheduleId") Long scheduleId,
-                                     @RequestParam("trainerId") Long trainerId) {
+    public String updateClassTrainer(@PathVariable("scheduleId") Long scheduleId, @RequestParam Long trainerId) {
         scheduleService.updateClassTrainer(scheduleId, trainerId);
         return "redirect:/schedule/view";
     }
 
     @PostMapping("/schedule/edit/{scheduleId}/participants")
-    public String updateScheduleParticipants(@PathVariable("scheduleId") Long scheduleId,
-                                            @RequestParam("userIds") List<Long> userIds) {
+    public String updateScheduleParticipants(@PathVariable("scheduleId") Long scheduleId, @RequestParam List<Long> userIds) {
         scheduleService.updateScheduleParticipants(scheduleId, userIds);
+        return "redirect:/schedule/view";
+    }
+
+    @PostMapping("/schedule/mark-attendance/{scheduleId}")
+    public String markAttendance(@PathVariable("scheduleId") Long scheduleId, @RequestParam("userIds") List<Long> userIds) {
+        scheduleService.markAttendance(scheduleId, userIds);
         return "redirect:/schedule/view";
     }
 }

@@ -9,13 +9,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Service
 public class ScheduleService {
@@ -28,18 +25,8 @@ public class ScheduleService {
 
     public void scheduleSession(Long trainerId, List<Long> userIds, LocalDate date, LocalTime startTime, LocalTime endTime) {
 
-        Schedule schedule = new Schedule();
-        schedule.setTrainerId(trainerId);
-        schedule.setDate(date);
-        schedule.setStartTime(startTime);
-        schedule.setEndTime(endTime);
-
-        Set<User> participants = new HashSet<>();
-        for (Long userId : userIds) {
-            User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
-            user.getSchedules().add(schedule);
-            participants.add(user);
-        }
+        Schedule schedule = new Schedule(trainerId, date, startTime, endTime);
+        Set<User> participants = getParticipantsFromUserIds(userIds, schedule);
         schedule.setParticipants(participants);
         scheduleRepository.save(schedule);
     }
@@ -69,6 +56,21 @@ public class ScheduleService {
         scheduleRepository.save(schedule);
     }
 
+    public void markAttendance(Long scheduleId, List<Long> absentUserIds) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
+        Set<User> participants = schedule.getParticipants();
+        Set<User> absentUsers = new HashSet<>();
+
+        for (User participant : participants) {
+            if (!absentUserIds.contains(participant.getUserId())) {
+                absentUsers.add(participant);
+            }
+        }
+
+        schedule.setAbsentUsers(absentUsers);
+        scheduleRepository.save(schedule);
+    }
+
 
     public List<Schedule> getAllSchedules() {
         return scheduleRepository.findAll();
@@ -89,4 +91,15 @@ public class ScheduleService {
             return findByParticipantsContaining(user);
         }
     }
+
+    private Set<User> getParticipantsFromUserIds(List<Long> userIds, Schedule schedule) {
+        Set<User> participants = new HashSet<>();
+        for (Long userId : userIds) {
+            User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+            user.getSchedules().add(schedule);
+            participants.add(user);
+        }
+        return participants;
+    }
+
 }

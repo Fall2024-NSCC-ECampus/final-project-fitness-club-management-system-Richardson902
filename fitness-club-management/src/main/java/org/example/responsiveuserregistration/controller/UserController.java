@@ -1,30 +1,26 @@
 package org.example.responsiveuserregistration.controller;
 
-import jakarta.validation.Valid;
 import org.example.responsiveuserregistration.model.User;
 import org.example.responsiveuserregistration.repository.UserRepository;
+import org.example.responsiveuserregistration.service.AuthService;
 import org.example.responsiveuserregistration.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Optional;
-import java.util.Set;
 
 @Controller
 public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AuthService authService;
 
     @Autowired
     private UserRepository userRepository;
@@ -48,17 +44,6 @@ public class UserController {
         }
     }
 
-    @GetMapping("/login")
-    public String login() {
-        return "login";
-    }
-
-    @GetMapping("/register")
-    public String register(Model model) {
-        model.addAttribute("user", new User());
-        return "register";
-    }
-
     @GetMapping("/")
     public String home() {
         return "index";
@@ -75,26 +60,12 @@ public class UserController {
     public String updatePassword(@AuthenticationPrincipal UserDetails userdetails, @RequestParam("newPassword") String newPassword, Model model) {
         String username = userdetails.getUsername();
         try {
-            userService.updatePassword(username, newPassword);
+            authService.updatePassword(username, newPassword);
             model.addAttribute("successMessage", "Password updated successfully");
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
         }
         return "account";
-    }
-
-    @PostMapping("/register")
-    public String registerUser(@Valid @ModelAttribute("user") User user, BindingResult result, Model model) {
-        if (result.hasErrors()) {
-            return "register";
-        }
-        try {
-            userService.registerUser(user.getUsername(), user.getEmail(), user.getPassword());
-            return "redirect:/users";
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "register";
-        }
     }
 
     @PostMapping("/clearTable")
