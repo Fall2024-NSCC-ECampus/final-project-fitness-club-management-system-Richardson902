@@ -55,4 +55,7 @@ public class Schedule {
     //TODO: remove user registration and make it admin only
     //TODO: refactor some business logic to service layer
     //TODO: try and implement DTOs
+    //TODO: black out button for mark attendance if nothing checked to prevent error.
+    //TODO: make it so the trainer cant be a participant of the class
+    //TODO: make it so the trainer can also see classes that they train in.
 }

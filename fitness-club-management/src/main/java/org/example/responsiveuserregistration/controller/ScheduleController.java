@@ -93,19 +93,19 @@ public class ScheduleController {
         if (result.hasErrors()) {
             return "editsessiontimes";
         }
-        scheduleService.updateClassTime(scheduleId, request.getStartTime(), request.getEndTime());
+        scheduleService.updateSchedule(scheduleId, request.getStartTime(), request.getEndTime(), null, null);
         return "redirect:/schedule/view";
     }
 
     @PostMapping("/schedule/edit/{scheduleId}/trainer")
     public String updateClassTrainer(@PathVariable("scheduleId") Long scheduleId, @RequestParam Long trainerId) {
-        scheduleService.updateClassTrainer(scheduleId, trainerId);
+        scheduleService.updateSchedule(scheduleId, null, null, trainerId, null);
         return "redirect:/schedule/view";
     }
 
     @PostMapping("/schedule/edit/{scheduleId}/participants")
     public String updateScheduleParticipants(@PathVariable("scheduleId") Long scheduleId, @RequestParam List<Long> userIds) {
-        scheduleService.updateScheduleParticipants(scheduleId, userIds);
+        scheduleService.updateSchedule(scheduleId, null, null, null, userIds);
         return "redirect:/schedule/view";
     }
 
