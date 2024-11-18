@@ -12,8 +12,11 @@ import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.LinkedHashSet;
 
-
+/**
+ * Service class for managing schedules.
+ */
 @Service
 public class ScheduleService {
 
@@ -23,75 +26,14 @@ public class ScheduleService {
     @Autowired
     private ScheduleRepository scheduleRepository;
 
-    public void scheduleSession(Long trainerId, List<Long> userIds, LocalDate date, LocalTime startTime, LocalTime endTime) {
 
-        Schedule schedule = new Schedule(trainerId, date, startTime, endTime);
-        Set<User> participants = getParticipantsFromUserIds(userIds, schedule);
-        schedule.setParticipants(participants);
-        scheduleRepository.save(schedule);
-    }
-
-    public void updateClassTime(Long scheduleId, LocalTime startTime, LocalTime endTime) {
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
-        schedule.setStartTime(startTime);
-        schedule.setEndTime(endTime);
-        scheduleRepository.save(schedule);
-    }
-
-    public void updateClassTrainer(Long scheduleId, Long trainerId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
-        schedule.setTrainerId(trainerId);
-        scheduleRepository.save(schedule);
-    }
-
-    public void updateScheduleParticipants(Long scheduleId, List<Long> userIds) {
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
-        Set<User> participants = new HashSet<>();
-        for (Long userId : userIds) {
-            User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
-            user.getSchedules().add(schedule);
-            participants.add(user);
-        }
-        schedule.setParticipants(participants);
-        scheduleRepository.save(schedule);
-    }
-
-    public void markAttendance(Long scheduleId, List<Long> absentUserIds) {
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
-        Set<User> participants = schedule.getParticipants();
-        Set<User> absentUsers = new HashSet<>();
-
-        for (User participant : participants) {
-            if (!absentUserIds.contains(participant.getUserId())) {
-                absentUsers.add(participant);
-            }
-        }
-
-        schedule.setAbsentUsers(absentUsers);
-        scheduleRepository.save(schedule);
-    }
-
-
-    public List<Schedule> getAllSchedules() {
-        return scheduleRepository.findAll();
-    }
-
-    public Schedule findById(Long scheduleId) {
-        return scheduleRepository.findById(scheduleId).orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
-    }
-
-    public List<Schedule> findByParticipantsContaining(User user) {
-        return scheduleRepository.findByParticipantsContaining(user);
-    }
-
-    public List<Schedule> getSchedulesForUser(User user) {
-        if (user.getRoles().contains("ADMIN")) {
-            return getAllSchedules();
-        } else {
-            return findByParticipantsContaining(user);
-        }
-    }
-
+    /**
+     * Retrieves participants from a list of user IDs and associates them with a schedule/
+     *
+     * @param userIds List of user IDs.
+     * @param schedule The Schedule to associate thr users with.
+     * @return A sorted set of users by name.
+     */
     private Set<User> getParticipantsFromUserIds(List<Long> userIds, Schedule schedule) {
         Set<User> participants = new HashSet<>();
         for (Long userId : userIds) {
@@ -100,6 +42,135 @@ public class ScheduleService {
             participants.add(user);
         }
         return participants;
+    }
+
+    /**
+     * Schedules a new session.
+     *
+     * @param trainerId The ID of the trainer.
+     * @param userIds List of user IDs to participate in the session.
+     * @param date The date of the session
+     * @param startTime The start time of the session.
+     * @param endTime The end time of the session.
+     */
+    public void scheduleSession(Long trainerId, List<Long> userIds, LocalDate date, LocalTime startTime, LocalTime endTime) {
+        Schedule schedule = new Schedule(trainerId, date, startTime, endTime);
+        Set<User> participants = getParticipantsFromUserIds(userIds, schedule);
+
+        schedule.setParticipants(participants);
+        scheduleRepository.save(schedule);
+    }
+
+    /**
+     * Updates the time of an existing class session.
+     *
+     * @param scheduleId The ID of the schedule to update.
+     * @param startTime The new start time.
+     * @param endTime The new end time.
+     */
+    public void updateClassTime(Long scheduleId, LocalTime startTime, LocalTime endTime) {
+        Schedule schedule = findById(scheduleId);
+        schedule.setStartTime(startTime);
+        schedule.setEndTime(endTime);
+        scheduleRepository.save(schedule);
+    }
+
+    /**
+     * Updates the trainer of an existing class session.
+     *
+     * @param scheduleId The ID of the schedule to update.
+     * @param trainerId The ID of the new trainer.
+     */
+    public void updateClassTrainer(Long scheduleId, Long trainerId) {
+        Schedule schedule = findById(scheduleId);
+        schedule.setTrainerId(trainerId);
+        scheduleRepository.save(schedule);
+    }
+
+    /**
+     * Updates the participants of an existing class session.
+     *
+     * @param scheduleId The ID of the schedule to update.
+     * @param userIds The new list of user IDs to participate in the session.
+     */
+    public void updateScheduleParticipants(Long scheduleId, List<Long> userIds) {
+        Schedule schedule = findById(scheduleId);
+        Set<User> participants = getParticipantsFromUserIds(userIds, schedule);
+
+        schedule.setParticipants(participants);
+        scheduleRepository.save(schedule);
+    }
+
+    /**
+     * Marks the attendance of participants for a session.
+     *
+     * @param scheduleId The ID of the schedule.
+     * @param absentUserIds List of user IDs who are absent.
+     */
+    public void markAttendance(Long scheduleId, List<Long> absentUserIds) {
+        Schedule schedule = findById(scheduleId);
+        Set<User> participants = schedule.getParticipants();
+        Set<User> absentUsers = new HashSet<>();
+
+        for (User participant : participants) {
+            if (!absentUserIds.contains(participant.getUserId())) {
+                absentUsers.add(participant);
+            }
+        }
+        schedule.setAbsentUsers(absentUsers);
+        scheduleRepository.save(schedule);
+    }
+
+
+    /**
+     * Retrieves all scheduled sessions.
+     *
+     * @return A list of all scheduled sessions.
+     */
+    public List<Schedule> getAllSchedules() {
+        List<Schedule> schedules = scheduleRepository.findAllOrderedByDateAndTime();
+        for (Schedule schedule : schedules) {
+            schedule.setParticipants(new LinkedHashSet<>(userRepository.findParticipantsByScheduleID(schedule.getScheduleId()))); // ensures data is sorted by name before passing to the view
+            schedule.setAbsentUsers(new LinkedHashSet<>(userRepository.findAbsentUsersByScheduleID(schedule.getScheduleId())));
+            User trainer = userRepository.findById(schedule.getTrainerId()).orElseThrow(() -> new IllegalArgumentException("Trainer not found"));
+            schedule.setTrainerName(trainer.getUsername());
+        }
+        return schedules;
+    }
+
+
+    /**
+     * Finds a scheduled session by its ID.
+     *
+     * @param scheduleId The ID of the schedule session to find.
+     * @return the found schedule session.
+     */
+    public Schedule findById(Long scheduleId) {
+        return scheduleRepository.findById(scheduleId).orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
+    }
+
+    /**
+     * Finds schedule sessions by a participant.
+     *
+     * @param user The user to find schedule sessions for.
+     * @return A list of schedule sessions containing the user.
+     */
+    public List<Schedule> findByParticipantsContaining(User user) {
+        return scheduleRepository.findByParticipantsContaining(user);
+    }
+
+    /**
+     * Retrieves schedule sessions for a user
+     *
+     * @param user The user to retrieve schedule sessions for.
+     * @return A list of schedule sessions for the user.
+     */
+    public List<Schedule> getSchedulesForUser(User user) {
+        if (user.getRoles().contains("ADMIN")) {
+            return getAllSchedules();
+        } else {
+            return findByParticipantsContaining(user);
+        }
     }
 
 }

@@ -34,15 +34,6 @@ public class UserService implements UserDetailsService {
     }
 
     // We love getting rid of redundancy
-    public User getUserByUsername(String username) {
-        Optional<User> userOptional= userRepository.findByUsername(username);
-        if (userOptional.isPresent()) {
-            return userOptional.get();
-        } else {
-            throw new IllegalArgumentException("User not found");
-        }
-    }
-
     private User getUserById(Long userId) {
         Optional<User> userOptional= userRepository.findById(userId);
         if (userOptional.isPresent()) {
@@ -52,13 +43,23 @@ public class UserService implements UserDetailsService {
         }
     }
 
+    public User getUserByUsername(String username) {
+        Optional<User> userOptional= userRepository.findByUsername(username);
+        if (userOptional.isPresent()) {
+            return userOptional.get();
+        } else {
+            throw new IllegalArgumentException("User not found");
+        }
+    }
+
     public List<User> getUsersByRole(String role) {
-        return userRepository.findByRolesContaining(role);
+        return userRepository.findUserByRoleOrderedByUsername(role);
     }
 
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        return userRepository.findAllOrderedByUsername();
     }
+
 
     // Create a default admin user if one does not exist - called at startup
     private void createDefaultAdmin() {

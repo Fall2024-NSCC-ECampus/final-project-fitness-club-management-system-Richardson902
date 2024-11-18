@@ -41,6 +41,8 @@ public class Schedule {
     @ManyToMany(fetch = FetchType.LAZY)
     private Set<User> absentUsers = new HashSet<>();
 
+    @Transient
+    private String trainerName;
 
     public Schedule(Long trainerId, LocalDate date, LocalTime startTime, LocalTime endTime) {
         this.trainerId = trainerId;
@@ -48,4 +50,9 @@ public class Schedule {
         this.startTime = startTime;
         this.endTime = endTime;
     }
+
+    //TODO: fix formatting of html
+    //TODO: remove user registration and make it admin only
+    //TODO: refactor some business logic to service layer
+    //TODO: try and implement DTOs
 }

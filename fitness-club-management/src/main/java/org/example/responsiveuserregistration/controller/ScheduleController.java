@@ -41,6 +41,7 @@ public class ScheduleController {
     public String viewSchedule(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         User user = userService.getUserByUsername(userDetails.getUsername());
         List<Schedule> schedules = scheduleService.getSchedulesForUser(user);
+
         model.addAttribute("schedules", schedules);
         return "viewschedule";
     }

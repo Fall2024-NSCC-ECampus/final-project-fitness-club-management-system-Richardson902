@@ -27,7 +27,7 @@
             <td th:text="${schedule.date}"></td>
             <td th:text="${schedule.startTime}"></td>
             <td th:text="${schedule.endTime}"></td>
-            <td th:text="${schedule.trainerId}"></td>
+            <td th:text="${schedule.trainerName}"></td>
             <td>
                 <ul>
                     <li th:each="participant : ${schedule.participants}" th:text="${participant.username}"></li>
@@ -35,7 +35,7 @@
             </td>
             <td sec:authorize="hasRole('ADMIN')">
                 <ul>
-                    <li th:each="participant : ${schedule.absentUsers}" th:text="${participant.username}"></li>
+                    <li th:each="absentUser : ${schedule.absentUsers}" th:text="${absentUser.username}"></li>
             <td sec:authorize="hasRole('ROLE_ADMIN')">
                 <a th:href="@{/schedule/edit/{scheduleId}/times(scheduleId=${schedule.scheduleId})}" class="btn btn-primary">Edit Times</a>
                 <a th:href="@{/schedule/edit/{scheduleId}/trainer(scheduleId=${schedule.scheduleId})}" class="btn btn-primary">Edit Trainer</a>
