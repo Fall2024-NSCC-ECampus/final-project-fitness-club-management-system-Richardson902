@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findByParticipantsContaining(User user);
+    List<Schedule> findByTrainerId(Long trainerId);
 
     @Query("SELECT s FROM Schedule s ORDER BY s.date, s.startTime")
     List<Schedule> findAllOrderedByDateAndTime();

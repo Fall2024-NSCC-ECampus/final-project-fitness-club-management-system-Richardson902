@@ -74,46 +74,6 @@ public class ScheduleService {
         }
         scheduleRepository.save(schedule);
     }
-//
-//    /**
-//     * Updates the time of an existing class session.
-//     *
-//     * @param scheduleId The ID of the schedule to update.
-//     * @param startTime The new start time.
-//     * @param endTime The new end time.
-//     */
-//    public void updateClassTime(Long scheduleId, LocalTime startTime, LocalTime endTime) {
-//        Schedule schedule = findById(scheduleId);
-//        schedule.setStartTime(startTime);
-//        schedule.setEndTime(endTime);
-//        scheduleRepository.save(schedule);
-//    }
-
-//    /**
-//     * Updates the trainer of an existing class session.
-//     *
-//     * @param scheduleId The ID of the schedule to update.
-//     * @param trainerId The ID of the new trainer.
-//     */
-//    public void updateClassTrainer(Long scheduleId, Long trainerId) {
-//        Schedule schedule = findById(scheduleId);
-//        schedule.setTrainerId(trainerId);
-//        scheduleRepository.save(schedule);
-//    }
-//
-//    /**
-//     * Updates the participants of an existing class session.
-//     *
-//     * @param scheduleId The ID of the schedule to update.
-//     * @param userIds The new list of user IDs to participate in the session.
-//     */
-//    public void updateScheduleParticipants(Long scheduleId, List<Long> userIds) {
-//        Schedule schedule = findById(scheduleId);
-//        Set<User> participants = getParticipantsFromUserIds(userIds, schedule);
-//
-//        schedule.setParticipants(participants);
-//        scheduleRepository.save(schedule);
-//    }
 
     /**
      * Marks the attendance of participants for a session.
@@ -144,11 +104,10 @@ public class ScheduleService {
     public List<Schedule> getAllSchedules() {
         List<Schedule> schedules = scheduleRepository.findAllOrderedByDateAndTime();
         for (Schedule schedule : schedules) {
-            schedule.setParticipants(new LinkedHashSet<>(userRepository.findParticipantsByScheduleID(schedule.getScheduleId()))); // ensures data is sorted by name before passing to the view
-            schedule.setAbsentUsers(new LinkedHashSet<>(userRepository.findAbsentUsersByScheduleID(schedule.getScheduleId())));
-            User trainer = userRepository.findById(schedule.getTrainerId())
-                    .orElseThrow(() -> new IllegalArgumentException("Trainer not found"));
-            schedule.setTrainerName(trainer.getUsername());
+            schedule.setParticipants(new LinkedHashSet<>(userRepository
+                    .findParticipantsByScheduleID(schedule.getScheduleId()))); // ensures data is sorted by name before passing to the view
+            schedule.setAbsentUsers(new LinkedHashSet<>(userRepository
+                    .findAbsentUsersByScheduleID(schedule.getScheduleId())));
         }
         return schedules;
     }
@@ -160,11 +119,19 @@ public class ScheduleService {
      * @return A list of schedule sessions for the user.
      */
     public List<Schedule> getSchedulesForUser(User user) {
+        List<Schedule> schedules;
         if (user.getRoles().contains("ADMIN")) {
             return getAllSchedules();
         } else {
-            return findByParticipantsContaining(user);
+            schedules = scheduleRepository.findByParticipantsContaining(user);
+            schedules.addAll(scheduleRepository.findByTrainerId(user.getUserId()));
         }
+        for (Schedule schedule : schedules) {
+            User trainer = userRepository.findById(schedule.getTrainerId())
+                    .orElseThrow(() -> new IllegalArgumentException("Trainer not found"));
+            schedule.setTrainerName(trainer.getUsername());
+        }
+        return schedules;
     }
 
 
