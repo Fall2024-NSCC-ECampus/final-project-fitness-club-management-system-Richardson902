@@ -2,7 +2,7 @@
 
 ## Features to Implement
 - [ ] change user email
-- [ ] change user username
+- [x] change user username
 
 ## Bugs to Fix
 
@@ -10,6 +10,7 @@
 ## Improvements
 - [ ] Improve UI/UX for the dashboard
 - [ ] Fix UserDetails page formatting
+- [ ] use new UI for error messages in registration
 
 ## Documentation
 - [ ] Update README with setup instructions

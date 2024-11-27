@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.example.responsiveuserregistration.model.User;
 import org.example.responsiveuserregistration.payload.UpdateEmailRequest;
 import org.example.responsiveuserregistration.payload.UpdateUsernameRequest;
+import org.example.responsiveuserregistration.payload.UserRegistrationRequest;
 import org.example.responsiveuserregistration.repository.UserRepository;
 import org.example.responsiveuserregistration.service.AuthService;
 import org.example.responsiveuserregistration.service.UserService;
@@ -42,6 +43,7 @@ public class UserController {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isPresent()) {
             model.addAttribute("user", userOptional.get());
+            model.addAttribute("updateUsernameRequest", new UpdateUsernameRequest());
             return "userdetails";
         } else {
             model.addAttribute("errorMessage", "User not found");
@@ -91,34 +93,21 @@ public class UserController {
     }
 
     @PostMapping("/users/{userId}/updateUsername")
-    public String updateUsername(@PathVariable Long userId, @ModelAttribute @Valid UpdateUsernameRequest request, BindingResult result, Model model) {
+    public String updateUsername(@PathVariable Long userId, @Valid @ModelAttribute("updateUsernameRequest") UpdateUsernameRequest request, BindingResult result, Model model) {
+        User user = userService.getUserById(userId);
+        model.addAttribute("user", user);
         if (result.hasErrors()) {
-            model.addAttribute("errorMessage", "Invalid username");
-            return "redirect:/users/" + userId;
+            return "userdetails";
         }
         try {
-            userService.updateUsername(userId, request.getUsername());
-            model.addAttribute("successMessage", "Username updated successfully");
+            userService.updateUsername(userId, request);
+            return "redirect:/users/" + userId;
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
+            return "userdetails";
         }
-        return "redirect:/users/" + userId;
     }
 
-    @PostMapping("/users/{userId}/updateEmail")
-    public String updateEmail(@PathVariable Long userId, @ModelAttribute @Valid UpdateEmailRequest request, BindingResult result, Model model) {
-        if (result.hasErrors()) {
-            model.addAttribute("errorMessage", "Invalid email");
-            return "redirect:/users/" + userId;
-        }
-        try {
-            userService.updateEmail(userId, request.getEmail());
-            model.addAttribute("successMessage", "Email updated successfully");
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("errorMessage", e.getMessage());
-        }
-        return "redirect:/users/" + userId;
-    }
     @PostMapping("/users/{userId}/delete")
     public String deleteUser(@PathVariable Long userId, @AuthenticationPrincipal UserDetails currentUser, Model model) {
         try {

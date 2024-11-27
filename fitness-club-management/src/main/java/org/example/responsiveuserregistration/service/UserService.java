@@ -100,8 +100,8 @@ public class UserService implements UserDetailsService {
 
     }
 
-    public void updateUsername(Long userId, String newUsername) {
-        String username = newUsername.trim().toLowerCase();
+    public void updateUsername(Long userId, UpdateUsernameRequest request) {
+        String username = request.getUsername().trim().toLowerCase();
 
         if (userRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("Username already exists");
