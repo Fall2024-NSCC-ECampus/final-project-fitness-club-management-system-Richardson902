@@ -20,16 +20,16 @@
                 <div class="mb-3">
                     <a href="/schedule/view" class="btn btn-primary w-100">Schedule</a>
                 </div>
-                <div class="mb-3">
+                <div sec:authorize="hasRole('ADMIN')" class="mb-3">
                     <a href="/register" class="btn btn-primary w-100">Register User</a>
                 </div>
-                <div class="mb-3">
+                <div sec:authorize="hasRole('ADMIN')" class="mb-3">
                     <a href="/users" class="btn btn-primary w-100">List Users</a>
                 </div>
                 <div class="mb-3">
                     <a href="/account" class="btn btn-primary w-100">Account Details</a>
                 </div>
-                <div class="mb-3">
+                <div sec:authorize="hasRole('ADMIN')" class="mb-3">
                     <form th:action="@{/clearTable}" method="post">
                         <button type="submit" class="btn btn-danger w-100">Clear Table</button>
                     </form>

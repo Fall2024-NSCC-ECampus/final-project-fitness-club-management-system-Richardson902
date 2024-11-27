@@ -1,6 +1,9 @@
 package org.example.responsiveuserregistration.controller;
 
+import jakarta.validation.Valid;
 import org.example.responsiveuserregistration.model.User;
+import org.example.responsiveuserregistration.payload.UpdateEmailRequest;
+import org.example.responsiveuserregistration.payload.UpdateUsernameRequest;
 import org.example.responsiveuserregistration.repository.UserRepository;
 import org.example.responsiveuserregistration.service.AuthService;
 import org.example.responsiveuserregistration.service.UserService;
@@ -9,8 +12,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.naming.Binding;
 import java.util.Optional;
 
 @Controller
@@ -85,6 +90,35 @@ public class UserController {
         return "redirect:/users/" + userId;
     }
 
+    @PostMapping("/users/{userId}/updateUsername")
+    public String updateUsername(@PathVariable Long userId, @ModelAttribute @Valid UpdateUsernameRequest request, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("errorMessage", "Invalid username");
+            return "redirect:/users/" + userId;
+        }
+        try {
+            userService.updateUsername(userId, request.getUsername());
+            model.addAttribute("successMessage", "Username updated successfully");
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/users/" + userId;
+    }
+
+    @PostMapping("/users/{userId}/updateEmail")
+    public String updateEmail(@PathVariable Long userId, @ModelAttribute @Valid UpdateEmailRequest request, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("errorMessage", "Invalid email");
+            return "redirect:/users/" + userId;
+        }
+        try {
+            userService.updateEmail(userId, request.getEmail());
+            model.addAttribute("successMessage", "Email updated successfully");
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/users/" + userId;
+    }
     @PostMapping("/users/{userId}/delete")
     public String deleteUser(@PathVariable Long userId, @AuthenticationPrincipal UserDetails currentUser, Model model) {
         try {

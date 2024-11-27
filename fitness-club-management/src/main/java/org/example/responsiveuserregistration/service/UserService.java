@@ -2,6 +2,7 @@ package org.example.responsiveuserregistration.service;
 
 import jakarta.annotation.PostConstruct;
 import org.example.responsiveuserregistration.model.User;
+import org.example.responsiveuserregistration.payload.UpdateUsernameRequest;
 import org.example.responsiveuserregistration.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,7 +35,7 @@ public class UserService implements UserDetailsService {
     }
 
     // We love getting rid of redundancy
-    private User getUserById(Long userId) {
+    public User getUserById(Long userId) {
         Optional<User> userOptional= userRepository.findById(userId);
         if (userOptional.isPresent()) {
             return userOptional.get();
@@ -97,6 +98,27 @@ public class UserService implements UserDetailsService {
         }
         userRepository.delete(user);
 
+    }
+
+    public void updateUsername(Long userId, String newUsername) {
+        String username = newUsername.trim().toLowerCase();
+
+        if (userRepository.existsByUsername(username)) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+
+        User user = getUserById(userId);
+        user.setUsername(username);
+        userRepository.save(user);
+    }
+
+    public void updateEmail(Long userId, String newEmail) {
+        if (userRepository.existsByEmail(newEmail)) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+        User user = getUserById(userId);
+        user.setEmail(newEmail);
+        userRepository.save(user);
     }
 
     // For authentication (spring security moment)

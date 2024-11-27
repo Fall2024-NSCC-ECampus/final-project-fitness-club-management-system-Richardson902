@@ -50,11 +50,4 @@ public class Schedule {
         this.startTime = startTime;
         this.endTime = endTime;
     }
-
-    //TODO: fix formatting of html
-    //TODO: remove user registration and make it admin only
-    //TODO: refactor some business logic to service layer
-    //TODO: try and implement DTOs
-    //TODO: black out button for mark attendance if nothing checked to prevent error.
-    //TODO: make it so the trainer cant be a participant of the class
 }
