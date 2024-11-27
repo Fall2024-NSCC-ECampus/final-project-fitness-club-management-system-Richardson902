@@ -37,13 +37,13 @@ public class UserController {
 
     @GetMapping("/users/{userId}")
     public String getUserDetails(@PathVariable Long userId, Model model) {
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isPresent()) {
-            model.addAttribute("user", userOptional.get());
-//            model.addAttribute("updateUsernameRequest", new UpdateUsernameRequest());
-//            model.addAttribute("updateEmailRequest", new UpdateEmailRequest());
+        try {
+            User user = userService.getUserById(userId);
+            UserUpdateRequest userUpdateRequest = userService.getUserUpdateRequest(userId);
+            model.addAttribute("user", user);
+            model.addAttribute("userUpdateRequest", userUpdateRequest);
             return "userdetails";
-        } else {
+        } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", "User not found");
             return "redirect:/users";
         }
@@ -81,6 +81,8 @@ public class UserController {
 
     @PostMapping("/users/{userId}/update")
     public String updateUser(@PathVariable Long userId, @Valid @ModelAttribute("userUpdateRequest") UserUpdateRequest request, BindingResult result, Model model) {
+       User user = userService.getUserById(userId);
+       model.addAttribute("user", user);
        if (result.hasErrors()) {
            return "userdetails";
        }
@@ -89,7 +91,7 @@ public class UserController {
            return "redirect:/users/" + userId;
        } catch (IllegalArgumentException e) {
               model.addAttribute("errorMessage", e.getMessage());
-              return "redirect:/users/" + userId;
+              return "userdetails";
        }
     }
 

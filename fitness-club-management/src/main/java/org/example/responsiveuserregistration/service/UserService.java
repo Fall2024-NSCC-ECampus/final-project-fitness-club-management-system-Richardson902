@@ -88,7 +88,20 @@ public class UserService implements UserDetailsService {
 
     }
 
+    public UserUpdateRequest getUserUpdateRequest(Long userId) {
+        User user = getUserById(userId);
+        UserUpdateRequest userUpdateRequest = new UserUpdateRequest();
+        userUpdateRequest.setUsername(user.getUsername());
+        userUpdateRequest.setEmail(user.getEmail());
+        userUpdateRequest.setTrainerRole(user.getRoles().contains("TRAINER") ? "on" : null);
+        return userUpdateRequest;
+    }
+
     public void updateUser(Long userId, UserUpdateRequest request) {
+        if (userRepository.existsByUsernameOrEmail(request.getUsername(), request.getEmail())) {
+            throw new IllegalArgumentException("Username or email already exists");
+        }
+
         User user = getUserById(userId);
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());

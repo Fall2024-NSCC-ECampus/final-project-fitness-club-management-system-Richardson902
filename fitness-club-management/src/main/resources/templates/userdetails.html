@@ -12,12 +12,15 @@
         <div class="card">
             <div class="card-body">
                 <h1 class="card-title text-center">User Details</h1>
-                <form th:action="@{/users/{userId}/update(userId=${user.userId})}" th:object="${user}" method="post">
+                <form th:action="@{/users/{userId}/update(userId=${user.userId})}" th:object="${userUpdateRequest}" method="post">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username:</label>
                         <input type="text" id="username" th:field="*{username}" class="form-control" required>
                         <div th:if="${#fields.hasErrors('username')}" class="alert alert-danger" role="alert">
                             <span th:errors="*{username}"></span>
+                        </div>
+                        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                            <span th:text="${errorMessage}"></span>
                         </div>
                     </div>
                     <div class="mb-3">
@@ -25,6 +28,9 @@
                         <input type="email" id="email" th:field="*{email}" class="form-control" required>
                         <div th:if="${#fields.hasErrors('email')}" class="alert alert-danger" role="alert">
                             <span th:errors="*{email}"></span>
+                        </div>
+                        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                            <span th:text="${errorMessage}"></span>
                         </div>
                     </div>
                     <div class="form-check">

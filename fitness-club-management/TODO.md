@@ -1,7 +1,7 @@
 # TODO List
 
 ## Features to Implement
-- [ ] change user email
+- [x] change user email
 - [x] change user username
 - [ ] delete schedule session
 
@@ -10,7 +10,7 @@
 
 ## Improvements
 - [ ] Improve UI/UX for the dashboard
-- [ ] Fix UserDetails page formatting
+- [x] Fix UserDetails page formatting
 - [ ] use new UI for error messages in registration
 
 ## Documentation
