@@ -43,7 +43,7 @@ public class User {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "roles", joinColumns = @JoinColumn(name = "userId"))
     @Column(name = "role")
-    private Set<String> roles;
+    private Set<String> roles = new HashSet<>(); // default empty set
 
     @ManyToMany(mappedBy = "participants")
     private Set<Schedule> schedules = new HashSet<>();

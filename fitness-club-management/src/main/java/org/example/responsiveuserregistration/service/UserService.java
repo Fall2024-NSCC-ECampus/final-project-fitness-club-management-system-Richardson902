@@ -2,7 +2,7 @@ package org.example.responsiveuserregistration.service;
 
 import jakarta.annotation.PostConstruct;
 import org.example.responsiveuserregistration.model.User;
-import org.example.responsiveuserregistration.payload.UpdateUsernameRequest;
+import org.example.responsiveuserregistration.payload.UserUpdateRequest;
 import org.example.responsiveuserregistration.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -79,18 +79,6 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void updateUserRole(Long userId, String trainerRole) {
-        User user = getUserById(userId);
-        Set<String> roles = user.getRoles(); // Get the roles, not to be confused with rolls (mmmmm)
-        if (trainerRole != null) { // (if the checkbox is checked on front end)
-            roles.add("TRAINER");
-        } else {
-            roles.remove("TRAINER");
-        }
-        user.setRoles(roles); // updates the roles
-        userRepository.save(user);
-    }
-
     public void deleteUser(Long userId, String currentUsername) {
         User user = getUserById(userId);
         if (user.getUsername().equals(currentUsername)) {
@@ -100,24 +88,17 @@ public class UserService implements UserDetailsService {
 
     }
 
-    public void updateUsername(Long userId, UpdateUsernameRequest request) {
-        String username = request.getUsername().trim().toLowerCase();
-
-        if (userRepository.existsByUsername(username)) {
-            throw new IllegalArgumentException("Username already exists");
-        }
-
+    public void updateUser(Long userId, UserUpdateRequest request) {
         User user = getUserById(userId);
-        user.setUsername(username);
-        userRepository.save(user);
-    }
-
-    public void updateEmail(Long userId, String newEmail) {
-        if (userRepository.existsByEmail(newEmail)) {
-            throw new IllegalArgumentException("Email already exists");
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        Set<String> roles = user.getRoles();
+        if (request.getTrainerRole() != null) {
+            roles.add("TRAINER");
+        } else {
+            roles.remove("TRAINER");
         }
-        User user = getUserById(userId);
-        user.setEmail(newEmail);
+        user.setRoles(roles);
         userRepository.save(user);
     }
 

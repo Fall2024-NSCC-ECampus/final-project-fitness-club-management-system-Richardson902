@@ -3,6 +3,7 @@
 ## Features to Implement
 - [ ] change user email
 - [x] change user username
+- [ ] delete schedule session
 
 ## Bugs to Fix
 
