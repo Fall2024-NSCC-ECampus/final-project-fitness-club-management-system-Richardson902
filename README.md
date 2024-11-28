@@ -70,8 +70,8 @@ This Spring Boot application provides management for a fitness club, including u
 ### Authentication Endpoints
 
 - `GET /login` - Display the login form
-- `GET /register` - Display the registration form
-- `POST /register` - Handle user registration
+- `GET /register` - Display the registration form (admin)
+- `POST /register` - Handle user registration (admin)
 
 ### Account Endpoints
 
