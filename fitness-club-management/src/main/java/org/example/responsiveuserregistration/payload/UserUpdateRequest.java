@@ -5,6 +5,9 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+/**
+ * Request payload for updating user details.
+ */
 @Data
 public class UserUpdateRequest {
 

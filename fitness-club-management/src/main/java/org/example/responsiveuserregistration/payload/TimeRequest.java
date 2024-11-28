@@ -6,6 +6,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalTime;
 
+/**
+ * Request payload for updating schedule times.
+ */
 @Data
 public class TimeRequest {
 

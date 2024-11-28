@@ -6,6 +6,9 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+/**
+ * Request payload for user registration.
+ */
 @Data
 public class UserRegistrationRequest {
 

@@ -1,6 +1,7 @@
 package org.example.responsiveuserregistration.controller;
 
 import jakarta.validation.Valid;
+import org.example.responsiveuserregistration.exceptions.UserAlreadyExistsException;
 import org.example.responsiveuserregistration.model.User;
 import org.example.responsiveuserregistration.payload.UpdatePasswordRequest;
 import org.example.responsiveuserregistration.payload.UserUpdateRequest;
@@ -15,6 +16,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controller for managing user-related operations.
+ */
 @Controller
 public class UserController {
 
@@ -27,13 +31,24 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    //Get Mappings
+    /**
+     * Displays a list of all users.
+     *
+     * @param model the model to hold attributes for the view
+     * @return the name of the view to render
+     */
     @GetMapping("/users")
     public String getUsers(Model model) {
         model.addAttribute("users", userRepository.findAll());
         return "users";
     }
 
+    /**
+     * Displays the details of a specific user.
+     * @param userId the ID of the user to display
+     * @param model the model to hold attributes for the view
+     * @return the name of the view to render
+     */
     @GetMapping("/users/{userId}")
     public String getUserDetails(@PathVariable Long userId, Model model) {
         try {
@@ -43,16 +58,28 @@ public class UserController {
             model.addAttribute("userUpdateRequest", userUpdateRequest);
             return "userdetails";
         } catch (IllegalArgumentException e) {
-            model.addAttribute("errorMessage", "User not found");
+            model.addAttribute("errorMessage", e.getMessage());
             return "redirect:/users";
         }
     }
 
+    /**
+     * Displays the home page.
+     *
+     * @return the name of the view to render
+     */
     @GetMapping("/")
     public String home() {
         return "index";
     }
 
+    /**
+     * Displays the account page for the authenticated user.
+     *
+     * @param userdetails the authenticated user's details
+     * @param model the model to hold attributes for the view
+     * @return the name of the view to render
+     */
     @GetMapping("/account")
     public String account(@AuthenticationPrincipal UserDetails userdetails, Model model) {
         String username = userdetails.getUsername();
@@ -61,6 +88,15 @@ public class UserController {
         return "account";
     }
 
+    /**
+     * Updates the password for the authenticated user.
+     *
+     * @param userdetails the authenticated user's details
+     * @param request the request to update the password
+     * @param result the binding result for validation
+     * @param model the model to hold attributes for the view
+     * @return the name of the view to render
+     */
     @PostMapping("/account/updatePassword")
     public String updatePassword(@AuthenticationPrincipal UserDetails userdetails, @Valid @ModelAttribute("passwordUpdateRequest")UpdatePasswordRequest request, BindingResult result, Model model) {
         String username = userdetails.getUsername();
@@ -70,19 +106,22 @@ public class UserController {
         try {
             authService.updatePassword(username, request);
             model.addAttribute("successMessage", "Password updated successfully");
-            return "account";
+            return "account"; // doesn't redirect to prevent losing the success message
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
             return "account";
         }
     }
 
-    @PostMapping("/clearTable")
-    public String clearTable(Model model) {
-        userRepository.deleteAll();
-        return "index";
-    }
-
+    /**
+     * Updated the details of a specific user.
+     *
+     * @param userId the ID of the user to update
+     * @param request the request containing the updated user details
+     * @param result the binding result for validation
+     * @param model the model to hold attributes for the view
+     * @return the name of the view to render
+     */
     @PostMapping("/users/{userId}/update")
     public String updateUser(@PathVariable Long userId, @Valid @ModelAttribute("userUpdateRequest") UserUpdateRequest request, BindingResult result, Model model) {
        User user = userService.getUserById(userId);
@@ -94,12 +133,20 @@ public class UserController {
            userService.updateUser(userId, request);
            model.addAttribute("successMessage", "User updated successfully");
            return "userdetails";
-       } catch (IllegalArgumentException e) {
-              model.addAttribute("errorMessage", e.getMessage());
-              return "userdetails";
+       } catch (UserAlreadyExistsException e) {
+           model.addAttribute("errorMessage", e.getMessage());
+           return "userdetails";
        }
     }
 
+    /**
+     * Deletes a specific user.
+     *
+     * @param userId the ID of the user to delete
+     * @param currentUser the details of the authenticated user
+     * @param model the model to hold attributes for the view
+     * @return the name of the view to render
+     */
     @PostMapping("/users/{userId}/delete")
     public String deleteUser(@PathVariable Long userId, @AuthenticationPrincipal UserDetails currentUser, Model model) {
         try {
