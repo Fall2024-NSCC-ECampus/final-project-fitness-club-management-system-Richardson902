@@ -4,7 +4,6 @@
 
 
 ## Bugs to Fix
-- [ ] display errors when updating password from account page
 
 ## Improvements
 - [ ] use new UI for error messages in registration

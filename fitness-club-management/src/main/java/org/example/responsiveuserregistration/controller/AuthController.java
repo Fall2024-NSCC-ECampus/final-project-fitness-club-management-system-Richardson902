@@ -30,7 +30,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String registerUser(@Valid @ModelAttribute("userRegistrationRequest") UserRegistrationRequest request, BindingResult result, Model model) {
+    public String registerUser(@Valid @ModelAttribute("user") UserRegistrationRequest request, BindingResult result, Model model) {
         if (result.hasErrors()) {
             return "register";
         }

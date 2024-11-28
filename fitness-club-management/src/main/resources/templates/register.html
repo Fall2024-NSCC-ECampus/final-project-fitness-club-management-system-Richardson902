@@ -16,18 +16,33 @@
                     <form th:action="@{/register}" th:object="${user}" method="post">
                         <div class="mb-3">
                             <label for="username" class="form-label">Username:</label>
-                            <input type="text" id="username" th:field="*{username}" class="form-control" th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'" required>
-                            <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="invalid-feedback"></div>
+                            <input type="text" id="username" th:field="*{username}" class="form-control" required>
+                            <div th:if="${#fields.hasErrors('username')}" class="alert alert-danger" role="alert">
+                                <span th:errors="*{username}"></span>
+                            </div>
+                            <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                                <span th:text="${errorMessage}"></span>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email:</label>
-                            <input type="email" id="email" name="email" class="form-control" th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'" required>
-                            <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="invalid-feedback"></div>
+                            <input type="email" id="email" name="email" class="form-control" required>
+                            <div th:if="${#fields.hasErrors('email')}" class="alert alert-danger" role="alert">
+                                <span th:errors="*{email}"></span>
+                            </div>
+                            <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                                <span th:text="${errorMessage}"></span>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password:</label>
-                            <input type="password" id="password" name="password" class="form-control" th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'" required>
-                            <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="invalid-feedback"></div>
+                            <input type="password" id="password" name="password" class="form-control" required>
+                            <div th:if="${#fields.hasErrors('password')}" class="alert alert-danger" role="alert">
+                                <span th:errors="*{password}"></span>
+                            </div>
+                            <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                                <span th:text="${errorMessage}"></span>
+                            </div>
                         </div>
                             <button type="submit" class="btn btn-primary w-100">Register</button>
                     </form>

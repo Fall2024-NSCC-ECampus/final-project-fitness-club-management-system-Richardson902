@@ -56,5 +56,5 @@ public class User {
         this.password = hashedPassword;
         this.roles = roles;
     }
-    
+
 }
