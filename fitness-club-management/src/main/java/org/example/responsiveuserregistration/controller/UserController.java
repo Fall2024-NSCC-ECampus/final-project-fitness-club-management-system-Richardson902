@@ -92,7 +92,8 @@ public class UserController {
        }
        try {
            userService.updateUser(userId, request);
-           return "redirect:/users/" + userId;
+           model.addAttribute("successMessage", "User updated successfully");
+           return "userdetails";
        } catch (IllegalArgumentException e) {
               model.addAttribute("errorMessage", e.getMessage());
               return "userdetails";

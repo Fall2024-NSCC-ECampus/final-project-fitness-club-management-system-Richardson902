@@ -37,6 +37,9 @@
                         <input class="form-check-input" type="checkbox" id="trainerRole" name="trainerRole" th:checked="${user.roles.contains('TRAINER')}">
                         <label class="form-check-label" for="trainerRole">Trainer</label>
                     </div>
+                    <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                        <span th:text="${successMessage}"></span>
+                    </div>
                     <button type="submit" class="btn btn-primary mt-3 w-100">Update</button>
                 </form>
                 <form th:action="@{/users/{userId}/delete(userId=${user.userId})}" method="post" style="display:inline;" th:if="${!user.roles.contains('ADMIN')}">

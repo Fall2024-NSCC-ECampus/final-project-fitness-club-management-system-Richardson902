@@ -5,6 +5,7 @@ import org.example.responsiveuserregistration.model.User;
 import org.example.responsiveuserregistration.payload.UserUpdateRequest;
 import org.example.responsiveuserregistration.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,13 +16,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 @Service
 public class UserService implements UserDetailsService {
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private UserRepository userRepository;
@@ -29,28 +26,36 @@ public class UserService implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Value("${admin.username}")
+    private String adminUsername;
+
+    @Value("${admin.email}")
+    private String adminEmail;
+
+    @Value("${admin.password}")
+    private String adminPassword;
+
     @PostConstruct // This method will be called after the bean has been created
     public void init() {
         createDefaultAdmin();
     }
 
-    // We love getting rid of redundancy
-    public User getUserById(Long userId) {
-        Optional<User> userOptional= userRepository.findById(userId);
-        if (userOptional.isPresent()) {
-            return userOptional.get();
+    private User getUserByField(String field, String value) {
+        Optional<User> userOptional;
+        if (field.equals("id")) {
+            userOptional = userRepository.findById(Long.valueOf(value));
         } else {
-            throw new IllegalArgumentException("User not found");
+            userOptional = userRepository.findByUsername(value);
         }
+        return userOptional.orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+    public User getUserById(Long userId) {
+        return getUserByField("id", userId.toString());
     }
 
     public User getUserByUsername(String username) {
-        Optional<User> userOptional= userRepository.findByUsername(username);
-        if (userOptional.isPresent()) {
-            return userOptional.get();
-        } else {
-            throw new IllegalArgumentException("User not found");
-        }
+        return getUserByField("username", username);
     }
 
     public List<User> getUsersByRole(String role) {
@@ -64,19 +69,16 @@ public class UserService implements UserDetailsService {
 
     // Create a default admin user if one does not exist - called at startup
     private void createDefaultAdmin() {
-        String adminUsername = "admin";
-        String adminEmail = "admin@admin.com";
-        String adminPassword = "admin123"; // Great password, very secure
-
-        List<User> adminUser = userRepository.findByRolesContaining("ADMIN"); // DOES AN ADMIN EXIST?????
-        if (adminUser.isEmpty()) {
-            String hashedPassword = passwordEncoder.encode(adminPassword);
-            User admin = new User(adminUsername, adminEmail, hashedPassword, Set.of("Admin", "User")); // Create new user, add big bad admin status
+        if (userRepository.findByRolesContaining("ADMIN").isEmpty()) {
+            User admin = new User(adminUsername, adminEmail, passwordEncoder.encode(adminPassword), Set.of("ADMIN", "USER"));
             userRepository.save(admin);
-            logger.info("Admin user created");
-        } else {
-            logger.info("Admin user already exists");
         }
+//        List<User> adminUser = userRepository.findByRolesContaining("ADMIN"); // DOES AN ADMIN EXIST?????
+//        if (adminUser.isEmpty()) {
+//            String hashedPassword = passwordEncoder.encode(adminPassword);
+//            User admin = new User(adminUsername, adminEmail, hashedPassword, Set.of("Admin", "User")); // Create new user, add big bad admin status
+//            userRepository.save(admin);
+//        }
     }
 
     public void deleteUser(Long userId, String currentUsername) {

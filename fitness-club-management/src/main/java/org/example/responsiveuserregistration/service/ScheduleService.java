@@ -24,14 +24,6 @@ public class ScheduleService {
     @Autowired
     private ScheduleRepository scheduleRepository;
 
-
-    /**
-     * Retrieves participants from a list of user IDs and associates them with a schedule/
-     *
-     * @param userIds List of user IDs.
-     * @param schedule The Schedule to associate thr users with.
-     * @return A sorted set of users by name.
-     */
     private Set<User> getParticipantsFromUserIds(List<Long> userIds, Schedule schedule) {
         Set<User> participants = new HashSet<>();
         for (Long userId : userIds) {
@@ -43,15 +35,6 @@ public class ScheduleService {
         return participants;
     }
 
-    /**
-     * Schedules a new session.
-     *
-     * @param trainerId The ID of the trainer.
-     * @param userIds List of user IDs to participate in the session.
-     * @param date The date of the session
-     * @param startTime The start time of the session.
-     * @param endTime The end time of the session.
-     */
     public void scheduleSession(Long trainerId, List<Long> userIds, LocalDate date, LocalTime startTime, LocalTime endTime) {
         Schedule schedule = new Schedule(trainerId, date, startTime, endTime);
         userIds.remove(trainerId); // remove trainer from participants
@@ -102,12 +85,6 @@ public class ScheduleService {
         schedule.setParticipants(getParticipantsFromUserIds(userIds, schedule));
     }
 
-    /**
-     * Marks the attendance of participants for a session.
-     *
-     * @param scheduleId The ID of the schedule.
-     * @param absentUserIds List of user IDs who are absent.
-     */
     public void markAttendance(Long scheduleId, List<Long> absentUserIds) {
         Schedule schedule = findById(scheduleId);
         Set<User> participants = schedule.getParticipants();
@@ -122,12 +99,6 @@ public class ScheduleService {
         scheduleRepository.save(schedule);
     }
 
-
-    /**
-     * Retrieves all scheduled sessions.
-     *
-     * @return A list of all scheduled sessions.
-     */
     public List<Schedule> getAllSchedules() {
         List<Schedule> schedules = scheduleRepository.findAllOrderedByDateAndTime();
         for (Schedule schedule : schedules) {
@@ -139,12 +110,6 @@ public class ScheduleService {
         return schedules;
     }
 
-    /**
-     * Retrieves schedule sessions for a user
-     *
-     * @param user The user to retrieve schedule sessions for.
-     * @return A list of schedule sessions for the user.
-     */
     public List<Schedule> getSchedulesForUser(User user) {
         List<Schedule> schedules;
         if (user.getRoles().contains("ADMIN")) {
@@ -154,11 +119,7 @@ public class ScheduleService {
             schedules.addAll(scheduleRepository.findByTrainerId(user.getUserId()));
         }
 
-        for (Schedule schedule : schedules) {
-            User trainer = userRepository.findById(schedule.getTrainerId())
-                    .orElseThrow(() -> new IllegalArgumentException("Trainer not found"));
-            schedule.setTrainerName(trainer.getUsername());
-        }
+        schedules.forEach(this::setScheduleDetails);
 
         return schedules;
     }
@@ -167,35 +128,20 @@ public class ScheduleService {
         scheduleRepository.deleteById(scheduleId);
     }
 
-
-    /**
-     * Finds a scheduled session by its ID.
-     *
-     * @param scheduleId The ID of the schedule session to find.
-     * @return the found schedule session.
-     */
     public Schedule findById(Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
+        setScheduleDetails(schedule);
+        return schedule;
+    }
+
+    private void setScheduleDetails(Schedule schedule) {
         User trainer = userRepository.findById(schedule.getTrainerId())
                 .orElseThrow(() -> new IllegalArgumentException("Trainer not found"));
         schedule.setTrainerName(trainer.getUsername());
 
-        // Get and set sorted participants via query
-        List<User> sortedParticipants = userRepository.findParticipantsByScheduleID(scheduleId);
+        List<User> sortedParticipants = userRepository.findParticipantsByScheduleID(schedule.getScheduleId());
         schedule.setParticipants(new LinkedHashSet<>(sortedParticipants));
-
-        return schedule;
-    }
-
-    /**
-     * Finds schedule sessions by a participant.
-     *
-     * @param user The user to find schedule sessions for.
-     * @return A list of schedule sessions containing the user.
-     */
-    public List<Schedule> findByParticipantsContaining(User user) {
-        return scheduleRepository.findByParticipantsContaining(user);
     }
 
 }
