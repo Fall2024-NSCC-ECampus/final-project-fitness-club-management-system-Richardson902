@@ -2,53 +2,62 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>View Schedule</title>
+    <title>Schedule</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body>
-<div class="container">
-    <h1>View Schedule</h1>
-    <div class="mb-3" sec:authorize="hasRole('ADMIN')">
-        <a th:href="@{/schedule/edit}" class="btn btn-primary">New Session</a>
+<div th:replace="fragments/navbar::navbar"></div>
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="col-md-10">
+        <h1 class="text-center">Schedule</h1>
+        <div class="mb-3" sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/schedule/edit}" class="btn btn-primary w-100">New Session</a>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Trainer</th>
+                        <th>Participants</th>
+                        <th sec:authorize="hasRole('ADMIN') or hasRole('TRAINER')">Absent</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="schedule : ${schedules}">
+                        <td th:text="${schedule.date}"></td>
+                        <td th:text="${schedule.startTime}"></td>
+                        <td th:text="${schedule.endTime}"></td>
+                        <td th:text="${schedule.trainerName}"></td>
+                        <td>
+                            <ul>
+                                <li th:each="participant : ${schedule.participants}" th:text="${participant.username}"></li>
+                            </ul>
+                        </td>
+                        <td sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_TRAINER')">
+                            <ul>
+                                <li th:each="absentUser : ${schedule.absentUsers}" th:text="${absentUser.username}"></li>
+                            </ul>
+                        </td>
+                        <td>
+                            <a sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_TRAINER')" th:href="@{/schedule/mark-attendance/{scheduleId}(scheduleId=${schedule.scheduleId})}" class="btn btn-primary">Mark Attendance</a>
+                            <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/schedule/edit/{scheduleId}/times(scheduleId=${schedule.scheduleId})}" class="btn btn-primary">Edit Times</a>
+                            <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/schedule/edit/{scheduleId}/trainer(scheduleId=${schedule.scheduleId})}" class="btn btn-primary">Edit Trainer</a>
+                            <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/schedule/edit/{scheduleId}/participants(scheduleId=${schedule.scheduleId})}" class="btn btn-primary">Edit Participants</a>
+                            <form th:action="@{/schedule/delete/{scheduleId}(scheduleId=${schedule.scheduleId})}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-danger" sec:authorize="hasRole('ROLE_ADMIN')">Delete Session</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <table class="table table-bordered">
-        <thead>
-        <tr>
-            <th>Date</th>
-            <th>Start Time</th>
-            <th>End Time</th>
-            <th>Trainer</th>
-            <th>Participants</th>
-            <th sec:authorize="hasRole('ADMIN') or hasRole('TRAINER')">Absent</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="schedule : ${schedules}">
-            <td th:text="${schedule.date}"></td>
-            <td th:text="${schedule.startTime}"></td>
-            <td th:text="${schedule.endTime}"></td>
-            <td th:text="${schedule.trainerName}"></td>
-            <td>
-                <ul>
-                    <li th:each="participant : ${schedule.participants}" th:text="${participant.username}"></li>
-                </ul>
-            </td>
-            <td sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_TRAINER')">
-                <ul>
-                    <li th:each="absentUser : ${schedule.absentUsers}" th:text="${absentUser.username}"></li>
-                </ul>
-            <td>
-                <a sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_TRAINER')" th:href="@{/schedule/mark-attendance/{scheduleId}(scheduleId=${schedule.scheduleId})}" class="btn btn-primary">Mark Attendance</a>
-                <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/schedule/edit/{scheduleId}/times(scheduleId=${schedule.scheduleId})}" class="btn btn-primary">Edit Times</a>
-                <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/schedule/edit/{scheduleId}/trainer(scheduleId=${schedule.scheduleId})}" class="btn btn-primary">Edit Trainer</a>
-                <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/schedule/edit/{scheduleId}/participants(scheduleId=${schedule.scheduleId})}" class="btn btn-primary">Edit Participants</a>
-                <form th:action="@{/schedule/delete/{scheduleId}(scheduleId=${schedule.scheduleId})}" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-danger" sec:authorize="hasRole('ROLE_ADMIN')">Delete Session</button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

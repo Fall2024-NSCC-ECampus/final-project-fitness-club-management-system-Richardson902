@@ -1,16 +1,13 @@
 # TODO List
 
 ## Features to Implement
-- [x] change user email
-- [x] change user username
-- [x] delete schedule session
+
 
 ## Bugs to Fix
-
+- [ ] fix bug where can't update user if username and email not changed
+- [ ] display errors when updating password from account page
 
 ## Improvements
-- [x] Improve UI/UX for the dashboard
-- [x] Fix UserDetails page formatting
 - [ ] use new UI for error messages in registration
 
 ## Documentation
@@ -20,7 +17,6 @@
 ## General Tasks
 - [ ] fix formatting of html
 - [ ] refactor some business logic to service layer
-- [ ] try and implement DTOs
-- [ ] black out button for mark attendance if nothing checked to prevent error.
-- [ ] make it so the trainer cant be a participant of the class
 - [ ] fix format of schedule edit pages
+- [ ] proper exception handling
+- [ ] remove password from user list

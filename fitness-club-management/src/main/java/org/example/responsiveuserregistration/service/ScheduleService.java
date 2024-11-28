@@ -175,7 +175,12 @@ public class ScheduleService {
      * @return the found schedule session.
      */
     public Schedule findById(Long scheduleId) {
-        return scheduleRepository.findById(scheduleId).orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
+        User trainer = userRepository.findById(schedule.getTrainerId())
+                .orElseThrow(() -> new IllegalArgumentException("Trainer not found"));
+        schedule.setTrainerName(trainer.getUsername());
+        return schedule;
     }
 
     /**
