@@ -121,16 +121,18 @@ public class ScheduleService {
     public List<Schedule> getSchedulesForUser(User user) {
         List<Schedule> schedules;
         if (user.getRoles().contains("ADMIN")) {
-            return getAllSchedules();
+            schedules = getAllSchedules();
         } else {
             schedules = scheduleRepository.findByParticipantsContaining(user);
             schedules.addAll(scheduleRepository.findByTrainerId(user.getUserId()));
         }
+
         for (Schedule schedule : schedules) {
             User trainer = userRepository.findById(schedule.getTrainerId())
                     .orElseThrow(() -> new IllegalArgumentException("Trainer not found"));
             schedule.setTrainerName(trainer.getUsername());
         }
+
         return schedules;
     }
 

@@ -85,7 +85,7 @@ public class ScheduleController {
                                   @RequestParam("startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
                                   @RequestParam("endTime")@DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
         scheduleService.scheduleSession(trainerId, userIds, date, startTime, endTime);
-        return "redirect:/schedule/edit";
+        return "redirect:/schedule/view";
     }
 
     @PostMapping("/schedule/edit/{scheduleId}/time")
