@@ -29,11 +29,6 @@
                 <div class="mb-3">
                     <a href="/account" class="btn btn-primary w-100">Account Details</a>
                 </div>
-                <div sec:authorize="hasRole('ADMIN')" class="mb-3">
-                    <form th:action="@{/clearTable}" method="post">
-                        <button type="submit" class="btn btn-danger w-100">Clear Table</button>
-                    </form>
-                </div>
             </div>
         </div>
     </div>
