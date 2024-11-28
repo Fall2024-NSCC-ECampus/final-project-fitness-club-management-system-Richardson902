@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -110,8 +111,17 @@ public class ScheduleController {
     }
 
     @PostMapping("/schedule/mark-attendance/{scheduleId}")
-    public String markAttendance(@PathVariable("scheduleId") Long scheduleId, @RequestParam("userIds") List<Long> userIds) {
+    public String markAttendance(@PathVariable("scheduleId") Long scheduleId, @RequestParam(value = "userIds", required = false) List<Long> userIds) {
+        if (userIds == null) {
+            userIds = new ArrayList<>(); // ugly hack to avoid non-populated list when everyone absent from session
+        }
         scheduleService.markAttendance(scheduleId, userIds);
+        return "redirect:/schedule/view";
+    }
+
+    @PostMapping("/schedule/delete/{scheduleId}")
+    public String deleteSchedule(@PathVariable("scheduleId") Long scheduleId) {
+        scheduleService.deleteSchedule(scheduleId);
         return "redirect:/schedule/view";
     }
 }

@@ -14,7 +14,7 @@
             <label class="form-label">Participants:</label>
             <ul>
                 <li th:each="participant : ${schedule.participants}">
-                    <input type="checkbox" th:name="userIds" th:value="${participant.userId}"/>
+                    <input type="checkbox" th:name="userIds" th:value="${participant.userId}" class="form-check-input"/>
                     <span th:text="${participant.username}"></span>
                 </li>
             </ul>

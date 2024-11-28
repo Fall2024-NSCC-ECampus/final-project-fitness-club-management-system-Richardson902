@@ -3,13 +3,13 @@
 ## Features to Implement
 - [x] change user email
 - [x] change user username
-- [ ] delete schedule session
+- [x] delete schedule session
 
 ## Bugs to Fix
 
 
 ## Improvements
-- [ ] Improve UI/UX for the dashboard
+- [x] Improve UI/UX for the dashboard
 - [x] Fix UserDetails page formatting
 - [ ] use new UI for error messages in registration
 
@@ -23,3 +23,4 @@
 - [ ] try and implement DTOs
 - [ ] black out button for mark attendance if nothing checked to prevent error.
 - [ ] make it so the trainer cant be a participant of the class
+- [ ] fix format of schedule edit pages

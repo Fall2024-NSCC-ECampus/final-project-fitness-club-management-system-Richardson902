@@ -136,6 +136,10 @@ public class ScheduleService {
         return schedules;
     }
 
+    public void deleteSchedule(Long scheduleId) {
+        scheduleRepository.deleteById(scheduleId);
+    }
+
 
     /**
      * Finds a scheduled session by its ID.
