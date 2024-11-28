@@ -15,8 +15,5 @@
 - [ ] Add API documentation
 
 ## General Tasks
-- [ ] fix formatting of html
 - [ ] refactor some business logic to service layer
-- [ ] fix format of schedule edit pages
 - [ ] proper exception handling
-- [ ] remove password from user list

@@ -98,21 +98,27 @@ public class UserService implements UserDetailsService {
     }
 
     public void updateUser(Long userId, UserUpdateRequest request) {
-        if (userRepository.existsByUsernameOrEmail(request.getUsername(), request.getEmail())) {
-            throw new IllegalArgumentException("Username or email already exists");
+        User currentUser = getUserById(userId);
+
+        // if the username is different and the new username already exists
+        if (!currentUser.getUsername().equals(request.getUsername()) && userRepository.existsByUsername(request.getUsername())) {
+            throw new IllegalArgumentException("Username already exists");
         }
 
-        User user = getUserById(userId);
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        Set<String> roles = user.getRoles();
+        if (!currentUser.getEmail().equals(request.getEmail()) && userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+        currentUser.setUsername(request.getUsername());
+        currentUser.setEmail(request.getEmail());
+        Set<String> roles = currentUser.getRoles();
         if (request.getTrainerRole() != null) {
             roles.add("TRAINER");
         } else {
             roles.remove("TRAINER");
         }
-        user.setRoles(roles);
-        userRepository.save(user);
+        currentUser.setRoles(roles);
+        userRepository.save(currentUser);
     }
 
     // For authentication (spring security moment)
