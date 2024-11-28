@@ -9,10 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.LinkedHashSet;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service class for managing schedules.
@@ -56,23 +54,52 @@ public class ScheduleService {
      */
     public void scheduleSession(Long trainerId, List<Long> userIds, LocalDate date, LocalTime startTime, LocalTime endTime) {
         Schedule schedule = new Schedule(trainerId, date, startTime, endTime);
+        userIds.remove(trainerId); // remove trainer from participants
         schedule.setParticipants(getParticipantsFromUserIds(userIds, schedule));
         scheduleRepository.save(schedule);
     }
 
     public void updateSchedule(Long scheduleId, LocalTime startTime, LocalTime endTime, Long trainerId, List<Long> userIds) {
         Schedule schedule = findById(scheduleId);
+
+        // Update start and end times
         if (startTime != null && endTime != null) {
-            schedule.setStartTime(startTime);
-            schedule.setEndTime(endTime);
+            updateScheduleTimes(schedule, startTime, endTime);
         }
+
+        //Update trainer and participants
         if (trainerId != null) {
-            schedule.setTrainerId(trainerId);
+            updateScheduleTrainer(schedule, trainerId, userIds);
+        } else if (userIds != null) {
+            updateScheduleParticipants(schedule, userIds);
         }
-        if (userIds != null) {
-            schedule.setParticipants(getParticipantsFromUserIds(userIds, schedule));
-        }
+
+        // Save updated schedule
         scheduleRepository.save(schedule);
+    }
+
+    private void updateScheduleTimes(Schedule schedule, LocalTime startTime, LocalTime endTime) {
+        schedule.setStartTime(startTime);
+        schedule.setEndTime(endTime);
+    }
+
+    private void updateScheduleTrainer(Schedule schedule, Long trainerId, List<Long> userIds) {
+        schedule.setTrainerId(trainerId);
+
+        if (userIds == null) {
+            userIds = schedule.getParticipants().stream()
+                    .map(User::getUserId)
+                    .collect(Collectors.toList());
+        }
+
+        userIds = new ArrayList<>(userIds);
+        userIds.remove(trainerId);
+
+        schedule.setParticipants(getParticipantsFromUserIds(userIds, schedule));
+    }
+
+    private void updateScheduleParticipants(Schedule schedule, List<Long> userIds) {
+        schedule.setParticipants(getParticipantsFromUserIds(userIds, schedule));
     }
 
     /**

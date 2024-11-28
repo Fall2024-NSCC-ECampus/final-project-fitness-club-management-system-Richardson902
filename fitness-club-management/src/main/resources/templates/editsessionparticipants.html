@@ -38,7 +38,7 @@
     <div class="mb-3">
       <label for="newUsers" class="form-label">Users</label>
       <select id="newUsers" name="userIds" class="form-control" multiple required>
-        <option th:each="user : ${users}" th:value="${user.userId}" th:text="${user.username}"></option>
+        <option th:each="user : ${users}" th:value="${user.userId}" th:text="${user.username}" th:if="${user.userId != schedule.trainerId}"></option>
       </select>
     </div>
     <button type="submit" class="btn btn-primary">Update Participants</button>

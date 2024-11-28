@@ -35,6 +35,7 @@ public class ScheduleController {
         List<User> users = userService.getAllUsers();
         model.addAttribute("trainers", trainers);
         model.addAttribute("users", users);
+        model.addAttribute("trainerId", null); // God I hate thymeleaf
         return "newsession";
     }
 

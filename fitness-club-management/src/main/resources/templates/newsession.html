@@ -18,13 +18,13 @@
         <div class="mb-3">
             <label for="trainer" class="form-label">Trainer</label>
             <select id="trainer" name="trainerId" class="form-control" required>
-                <option th:each="trainer : ${trainers}" th:value="${trainer.userId}" th:text="${trainer.username}"></option>
+                <option th:each="trainer : ${trainers}" th:value="${trainer.userId}" th:text="${trainer.username}" th:selected="${trainer.userId == trainerId}"></option>
             </select>
         </div>
         <div class="mb-3">
             <label for="users" class="form-label">Users</label>
             <select id="users" name="userIds" class="form-control" multiple required>
-                <option th:each="user : ${users}" th:value="${user.userId}" th:text="${user.username}"></option>
+                <option th:each="user : ${users}" th:value="${user.userId}" th:text="${user.username}" th:if="${user.userId != trainerId}"></option>
             </select>
         </div>
         <div class="mb-3">
