@@ -4,6 +4,7 @@
 
 
 ## Bugs to Fix
+-[ ] fix ordering in tables for change participants and mark attendance. times, trainer
 
 ## Improvements
 - [ ] use new UI for error messages in registration

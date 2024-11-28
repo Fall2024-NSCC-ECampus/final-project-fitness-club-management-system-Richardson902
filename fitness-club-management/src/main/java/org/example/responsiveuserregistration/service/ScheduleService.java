@@ -180,6 +180,11 @@ public class ScheduleService {
         User trainer = userRepository.findById(schedule.getTrainerId())
                 .orElseThrow(() -> new IllegalArgumentException("Trainer not found"));
         schedule.setTrainerName(trainer.getUsername());
+
+        // Get and set sorted participants via query
+        List<User> sortedParticipants = userRepository.findParticipantsByScheduleID(scheduleId);
+        schedule.setParticipants(new LinkedHashSet<>(sortedParticipants));
+
         return schedule;
     }
 
