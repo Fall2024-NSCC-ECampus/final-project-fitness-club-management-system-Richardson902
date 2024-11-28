@@ -1,6 +1,7 @@
 package org.example.responsiveuserregistration.service;
 
 import org.example.responsiveuserregistration.model.User;
+import org.example.responsiveuserregistration.payload.UpdatePasswordRequest;
 import org.example.responsiveuserregistration.payload.UserRegistrationRequest;
 import org.example.responsiveuserregistration.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +39,9 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public void updatePassword(String username, String newPassword) {
+    public void updatePassword(String username, UpdatePasswordRequest request) {
         User user = userService.getUserByUsername(username);
-        String hashedPassword = passwordEncoder.encode(newPassword);
+        String hashedPassword = passwordEncoder.encode(request.getPassword());
         user.setPassword(hashedPassword); // sets new password to new hashed password. SECURITY MOMENT
         userRepository.save(user);
     }

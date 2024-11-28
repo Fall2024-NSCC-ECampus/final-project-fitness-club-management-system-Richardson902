@@ -4,7 +4,6 @@
 
 
 ## Bugs to Fix
-- [ ] fix bug where can't update user if username and email not changed
 - [ ] display errors when updating password from account page
 
 ## Improvements

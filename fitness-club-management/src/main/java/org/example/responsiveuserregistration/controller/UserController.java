@@ -2,6 +2,7 @@ package org.example.responsiveuserregistration.controller;
 
 import jakarta.validation.Valid;
 import org.example.responsiveuserregistration.model.User;
+import org.example.responsiveuserregistration.payload.UpdatePasswordRequest;
 import org.example.responsiveuserregistration.payload.UserUpdateRequest;
 import org.example.responsiveuserregistration.repository.UserRepository;
 import org.example.responsiveuserregistration.service.AuthService;
@@ -56,19 +57,24 @@ public class UserController {
     public String account(@AuthenticationPrincipal UserDetails userdetails, Model model) {
         String username = userdetails.getUsername();
         model.addAttribute("username", username);
+        model.addAttribute("passwordUpdateRequest", new UpdatePasswordRequest());
         return "account";
     }
 
     @PostMapping("/account/updatePassword")
-    public String updatePassword(@AuthenticationPrincipal UserDetails userdetails, @RequestParam("newPassword") String newPassword, Model model) {
+    public String updatePassword(@AuthenticationPrincipal UserDetails userdetails, @Valid @ModelAttribute("passwordUpdateRequest")UpdatePasswordRequest request, BindingResult result, Model model) {
         String username = userdetails.getUsername();
+        if (result.hasErrors()) {
+            return "account";
+        }
         try {
-            authService.updatePassword(username, newPassword);
+            authService.updatePassword(username, request);
             model.addAttribute("successMessage", "Password updated successfully");
+            return "account";
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
+            return "account";
         }
-        return "account";
     }
 
     @PostMapping("/clearTable")

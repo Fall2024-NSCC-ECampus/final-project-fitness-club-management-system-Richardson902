@@ -56,7 +56,5 @@ public class User {
         this.password = hashedPassword;
         this.roles = roles;
     }
-
-
-    //Add contraints to roles
+    
 }
