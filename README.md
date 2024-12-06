@@ -77,3 +77,31 @@ This Spring Boot application provides management for a fitness club, including u
 
 - `GET /account` - Display account details for the authenticated user
 - `POST /account/updatePassword` - Update password for the authenticated user
+
+## Output
+
+Here are some screenshots of the application in action
+
+### Dashboard
+![Dashboard](https://github.com/Fall2024-NSCC-ECampus/final-project-fitness-club-management-system-Richardson902/blob/main/output/dashboard-admin.JPG)
+
+### Login
+![Login](https://github.com/Fall2024-NSCC-ECampus/final-project-fitness-club-management-system-Richardson902/blob/main/output/login.JPG)
+
+### Register
+![Register](https://github.com/Fall2024-NSCC-ECampus/final-project-fitness-club-management-system-Richardson902/blob/main/output/register-admin.JPG)
+
+### Users
+![Users](https://github.com/Fall2024-NSCC-ECampus/final-project-fitness-club-management-system-Richardson902/blob/main/output/users.JPG)
+
+### User Details
+![UserDetails](https://github.com/Fall2024-NSCC-ECampus/final-project-fitness-club-management-system-Richardson902/blob/main/output/userdetails.JPG)
+
+### Account Details
+![AccountDetails](https://github.com/Fall2024-NSCC-ECampus/final-project-fitness-club-management-system-Richardson902/blob/main/output/accountdetails.JPG)
+
+### Schedule Session
+![ScheduleSession](https://github.com/Fall2024-NSCC-ECampus/final-project-fitness-club-management-system-Richardson902/blob/main/output/newsession.JPG)
+
+### Schedule - Admin View
+![Schedule](https://github.com/Fall2024-NSCC-ECampus/final-project-fitness-club-management-system-Richardson902/blob/main/output/schedule-admin.JPG)
